@@ -4,10 +4,18 @@
   "description": "An io platformer.",
   "main": "build.js",
   "dependencies": {
-    "gulp": "^4.0.0",
     "ws": "^6.1.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-deporder": "^1.1.0",
+    "gulp-htmlclean": "^2.7.22",
+    "gulp-imagemin": "^5.0.3",
+    "gulp-newer": "^1.4.0",
+    "gulp-strip-debug": "^3.0.0",
+    "gulp-uglify": "^3.0.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

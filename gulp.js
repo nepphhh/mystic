@@ -1,8 +1,10 @@
-import { task, watch } from 'gulp';
+import { task } from 'gulp';
 import { exec } from 'child_process';
 
-newer = require('gulp-newer'),
-imagemin = require('gulp-imagemin'),
+gulp = require('gulp');
+newer = require('gulp-newer');
+imagemin = require('gulp-imagemin');
+htmlclean = require('gulp-htmlclean');
 
 // Folders
 folder = {
@@ -14,7 +16,7 @@ folder = {
 var buildCommand = "cargo run";
 
 // Compress images
-gulp.task('images', () => {
+task('images', () => {
 	var out = folder.build + 'images/';
 	return gulp.src(folder.src + 'images/**/*')
 	  .pipe(newer(out))
@@ -31,8 +33,24 @@ task('build', () => {
 });
 
 task('watch', () => {
-	watch('src/*.cpp', ['build']);
-	watch('include/*.h', ['build']);
+	gulp.watch('src/*.cpp', ['build']);
+	gulp.watch('include/*.h', ['build']);
 });
+
+// HTML processing
+task('html', ['images'], function() {
+	var
+	  out = folder.build + 'html/',
+	  page = gulp.src(folder.src + 'html/**/*')
+		.pipe(newer(out));
+  
+	// minify production code
+	if (!devBuild) {
+	  page = page.pipe(htmlclean());
+	}
+  
+	return page.pipe(gulp.dest(out));
+  });
+  
 
 task('default', ['build', 'watch'], () => {} );

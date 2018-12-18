@@ -1,6 +1,6 @@
 [package]
-name = "aurobio"
-version = "0.1.0"
+name = "ourobio"
+version = "0.0.1"
 authors = ["hengstam"]
 edition = "2018"
 

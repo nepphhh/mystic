@@ -1,6 +1,6 @@
 {
-  "name": "aurobio",
-  "version": "1.0.0",
+  "name": "ourobio",
+  "version": "0.0.1",
   "description": "An io platformer.",
   "main": "build.js",
   "dependencies": {

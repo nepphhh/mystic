@@ -1,0 +1,20 @@
+{
+  "name": "aurobio",
+  "version": "1.0.0",
+  "description": "An io platformer.",
+  "main": "build.js",
+  "dependencies": {
+    "gulp": "^4.0.0",
+    "ws": "^6.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "aurobio"
+  },
+  "author": "Neph",
+  "license": "ISC"
+}

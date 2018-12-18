@@ -4,6 +4,7 @@
   "description": "An io platformer.",
   "main": "build.js",
   "dependencies": {
+    "jshint": "^2.9.7",
     "ws": "^6.1.2"
   },
   "devDependencies": {

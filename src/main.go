@@ -14,7 +14,7 @@ var addr = flag.String("addr", "localhost:8080", "http service address")
 // This opens the websocket connection
 var upgrader = websocket.Upgrader{}
 
-// This f
+// This function is the callback for when /ws requests are opened
 func ws(response http.ResponseWriter, request *http.Request) {
 
 	// Open the websocket

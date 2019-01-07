@@ -45,7 +45,7 @@ gulp.task("compile-ws-server", done => {
 gulp.task("launch-ws-server", done => {
     // Launch the compiled executable
     const server = child.execFile("ws-server.exe", { cwd: "./dist/" });
-    server.stderr.on('data', data => console.log('ws-server'.underline + ': ' + data));
+    server.stderr.on('data', data => console.log('server'.underline + ': ' + data));
     // The callback function tells gulp that this process is finished
     done(); 
 });

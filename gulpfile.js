@@ -41,17 +41,21 @@ gulp.task("compile-ws-server", done => {
     done(); 
 });
 
+
+// You'll just have to launch it yourself!
+
 // Launch the websocket server
-gulp.task("launch-ws-server", done => {
-    // Launch the compiled executable
-    const server = child.execFile("ws-server.exe", { cwd: "./dist/" });
-    server.stderr.on('data', data => console.log('server'.underline + ': ' + data));
-    // The callback function tells gulp that this process is finished
-    done(); 
-});
+//gulp.task("launch-ws-server", done => {
+//    // Launch the compiled executable
+//    const server = child.execFile(ws_server, { cwd: "./dist/" });
+//    server.stdout.on('data', data => console.log('server'.underline + ': ' + data));
+//    server.stderr.on('data', data => console.log('server'.underline + ': ' + data));
+//    // The callback function tells gulp that this process is finished
+//    done(); 
+//});
 
 // Consolidate all websocket server tasks
-gulp.task("ws-server", gulp.series("compile-ws-server", "launch-ws-server"));
+// gulp.task("ws-server", gulp.series("compile-ws-server", "launch-ws-server"));
 
 /***************
  * CLIENT STUFF
@@ -102,4 +106,4 @@ gulp.task("relink-revisions", done => {
 gulp.task("client", gulp.series("move-client-files", "build-js-client", "track-revisions", "relink-revisions"));
 
 // Start the server
-gulp.task("default", gulp.series("clear-dist", gulp.parallel("ws-server", "client"))); 
+gulp.task("default", gulp.series("clear-dist", gulp.parallel("compile-ws-server", "client"))); 

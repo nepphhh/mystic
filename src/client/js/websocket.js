@@ -21,7 +21,7 @@ module.exports = port => {
     socket.binaryType = 'arraybuffer';
     socket.open = false;
 
-    // The talking function
+    // The talking function (this method is public!)
     const talk = (...message) => {
 
         // Make sure the socket is open before we do anything

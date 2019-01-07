@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -16,59 +18,87 @@ var addr = flag.String("addr", "localhost:8080", "http service address")
 // This opens the websocket connection
 var upgrader = websocket.Upgrader{}
 
-// This function is the callback for when /ws requests are opened
-func ws(response http.ResponseWriter, request *http.Request) {
+// This function generates the callback connected to the game server
+func makews(uplink func([]byte)) func(http.ResponseWriter, *http.Request) {
 
-	// Open the websocket
-	socket, err := upgrader.Upgrade(response, request, nil)
+	// This function is the callback for when /ws requests are opened
+	return func(response http.ResponseWriter, request *http.Request) {
 
-	// Get upgrade errors
-	if err != nil {
-		log.Print("Socket init error:", err)
-		return
-	}
+		// Open the websocket
+		socket, err := upgrader.Upgrade(response, request, nil)
 
-	// Socket init
-	log.Println("Socket opened.")
-
-	// Response loop
-	for {
-		// Incoming message
-		_, data, err := socket.ReadMessage()
-
-		// Error handling
+		// Get upgrade errors
 		if err != nil {
-			log.Println("read:", err)
-			break
+			log.Print("Socket init error:", err)
+			return
 		}
 
-		// On-message action
-		log.Printf("recv: %s", data)
-	}
+		// Socket init
+		log.Println("Socket opened.")
 
-	// This callback closes the socket
-	defer func() {
-		socket.Close()
-		log.Println("Socket closed.")
-	}()
+		// Response loop
+		for {
+			// Incoming message
+			_, data, err := socket.ReadMessage()
+
+			// Error handling
+			if err != nil {
+				log.Println("read:", err)
+				break
+			}
+
+			// On-message action
+			uplink(data)
+			uplink([]byte("\r\n"))
+		}
+
+		// This callback closes the socket
+		defer func() {
+			socket.Close()
+			log.Println("Socket closed.")
+		}()
+
+	}
 
 }
 
-// This function manages the game server
-func game() {
+// This function manages the game server and returns a function which communicates with it
+func game() func([]byte) {
 
-	log.Println("Launching game server.")
+	log.Println("Starting game server...")
+	child := exec.Command("cargo", "run")
 
-	// Start the game server
-	out, err := exec.Command("cargo", "run").CombinedOutput()
-
+	// Set up I/O
+	out, err := child.StdoutPipe()
 	// Error handling
 	if err != nil {
-		log.Fatalf("cmd.Run() failed with %s\n", err)
+		log.Fatalf("Creating stdout for server failed: %s\n", err)
+	}
+
+	in, err := child.StdinPipe()
+	// Error handling
+	if err != nil {
+		log.Fatalf("Piping stdin to server failed: %s\n", err)
+	}
+
+	// Actually start it
+	err = child.Start()
+	if err != nil {
+		log.Fatalf("Starting server failed: %s\n", err)
 	}
 
 	// Do stuff with the output
-	log.Println(string(out))
+	scanner := bufio.NewScanner(out)
+	go func() {
+		for scanner.Scan() {
+			fmt.Printf("GAME: %s\n", scanner.Text())
+		}
+	}()
+
+	// Return an input handler so we can work with it
+	return func(message []byte) {
+		in.Write(message)
+	}
 
 }
 
@@ -78,18 +108,21 @@ func main() {
 	flag.Parse()
 	log.SetFlags(0)
 
+	// Start the game
+	uplink := game()
+
+	// Connect the websocket handler to the game server
+	ws := makews(uplink)
+
 	// Set up the callback for new websocket connections
 	http.HandleFunc("/ws", ws)
 
 	// Serve static files
-	static := http.FileServer(http.Dir("./client"))
+	static := http.FileServer(http.Dir("./dist/client"))
 	http.Handle("/", static)
 
-	// Start the game
-	game()
-
 	// Start serving the site
-	log.Println("Listening...")
+	log.Printf("Listening on %s.\n", *addr)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 
 }

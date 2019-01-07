@@ -30,5 +30,6 @@ Everything is processed and put into /dist/ thanks to gulp.
     npm install
     go get github.com/gorilla/websockets
 
-4) You should be able to build and run it now:
-    gulp
+4) You should be able to build and run it now (make sure you're in the main directory):
+    gulp & ./dist/ws-server (Linux)
+    gulp; ./dist/ws-server.exe (Windows, in Powershell)
